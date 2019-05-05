@@ -1,8 +1,27 @@
 #include <Wire.h>
 #include "Adafruit_SI1145.h"
 #include "ESP8266WiFi.h"
+// Include Sensirion library
+#include "SHT1x.h"
 
 Adafruit_SI1145 uv = Adafruit_SI1145();
+// Sensor pins
+#define dataPin  D7
+#define clockPin D6
+
+// variables for iot
+const char* server = "api.carriots.com";
+
+const String APIKEY = "61b01d105611b4c76d33080ee64eccd02f1c163625c9bb24ac5648b4f72e0b81";
+const String DEVICE = "wemosD1@juanvalen15.juanvalen15"; 
+
+// Variables for the temperature & humidity sensor
+float temperature;
+float humidity;
+float dewpoint;
+
+// Create sensor instance
+SHT1x sht1x(dataPin, clockPin);
 
 void setup() {
    
@@ -32,6 +51,7 @@ void loop() {
 
   lightSENSOR();
   wifiMODULE();
+  SHT1sensor();
  
 }
 
@@ -86,3 +106,30 @@ void wifiMODULE() {
   // Wait a bit before scanning again
   delay(5000);  
 }
+
+
+// temp + humidity sensor
+void SHT1sensor(){
+  float temp_c;
+  float temp_f;
+  float humidity;
+ 
+  // Read values from the sensor
+  temp_c = sht1x.readTemperatureC();
+  temp_f = sht1x.readTemperatureF();
+  humidity = sht1x.readHumidity();
+ 
+  // Print the values to the serial port
+  Serial.print("Temperature: ");
+  Serial.print(temp_c, DEC);
+  Serial.print("C / ");
+  Serial.print(temp_f, DEC);
+  Serial.print("F. Humidity: ");
+  Serial.print(humidity);
+  Serial.println("%");
+
+  delay(2000);
+}
+
+
+// send stream
